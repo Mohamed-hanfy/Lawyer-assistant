@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:mysql://lawyer-system-mohamed-0731.e.aivencloud.com:25083/Lawyer
+    username: avnadmin
+    password: AVNS_iyYQWXXkC874_MYA2RM
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  main:
+    allow-bean-definition-overriding: true
+
+  application:
+    security:
+      jwt:
+        secret-key: da6a980067da67a55cd6551fb3b6f2d6a87b03862a33852916ab1b9fbabc4dc0
+        expiration: 864000000
+
+
+server:
+  servlet:
+    context-path: /api/v1/
+springdoc:
+  swagger-ui:
+    csrf:
+      enabled: true
