@@ -20,16 +20,16 @@ public class WhatsAppService {
 
     private final WebClient webClient;
 
-    @Value("${whatsapp.api.key:150f07a1}")
+    @Value("${whatsapp.api.key}")
     private String apiKey;
 
-    @Value("k0AQIKc5X3JlyDYs")
+    @Value("${whatsapp.api.secret}")
     private String apiSecret;
 
-    @Value("${whatsapp.from.number:14157386102}")
+    @Value("${whatsapp.from.number}")
     private String fromNumber;
 
-    @Value("${whatsapp.api.url:https://messages-sandbox.nexmo.com/v1/messages}")
+    @Value("${whatsapp.api.url}")
     private String apiUrl;
 
     public Mono<WhatsAppResponse> sendMessage(String toPhoneNumber, String message) {

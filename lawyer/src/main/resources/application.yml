@@ -29,3 +29,10 @@ springdoc:
   swagger-ui:
     csrf:
       enabled: true
+whatsapp:
+  api:
+    key: 150f07a1
+    secret: k0AQIKc5X3JlyDYs
+    url: https://messages-sandbox.nexmo.com/v1/messages
+  from:
+    number: 14157386102
