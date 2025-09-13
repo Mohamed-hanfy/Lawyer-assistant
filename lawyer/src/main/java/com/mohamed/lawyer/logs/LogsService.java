@@ -52,6 +52,7 @@ public class LogsService {
         if (lawsuit.getClientPhone() != null && !lawsuit.getClientPhone().isEmpty()) {
             whatsAppService.sendLogNotification(
                 lawsuit.getClientPhone(),
+                lawsuit.getClientName(),
                 lawsuit.getName(),
                 request.message()
             );

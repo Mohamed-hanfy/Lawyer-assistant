@@ -55,9 +55,10 @@ public class WhatsAppService {
                 .doOnError(error -> log.error("Failed to send WhatsApp message to {}: {}", toPhoneNumber, error.getMessage()));
     }
 
-    public void sendLogNotification(String clientPhoneNumber, String lawsuitName, String logMessage) {
+    public void sendLogNotification(String clientPhoneNumber, String clientName, String lawsuitName, String logMessage) {
         String message = String.format(
-                "📋 New log entry for lawsuit '%s':\n\n%s\n\n⏰ %s",
+                "السلام عليكم %s 👋\n\n📋 تحديث جديد فالقضيه '%s':\n\n%s\n\n⏰ %s",
+                clientName,
                 lawsuitName,
                 logMessage,
                 java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -65,8 +66,8 @@ public class WhatsAppService {
 
         sendMessage(clientPhoneNumber, message)
                 .subscribe(
-                        response -> log.info("Log notification sent to client {}", clientPhoneNumber),
-                        error -> log.error("Failed to send log notification to client {}: {}", clientPhoneNumber, error.getMessage())
+                        response -> log.info("Log notification sent to client {} ({})", clientName, clientPhoneNumber),
+                        error -> log.error("Failed to send log notification to client {} ({}): {}", clientName, clientPhoneNumber, error.getMessage())
                 );
     }
 }
