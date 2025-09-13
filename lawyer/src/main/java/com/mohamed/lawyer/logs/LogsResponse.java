@@ -12,4 +12,6 @@ public class LogsResponse {
     private Long id;
     private String message;
     private LocalDateTime date;
+    private String lawsuitName;
+
 }

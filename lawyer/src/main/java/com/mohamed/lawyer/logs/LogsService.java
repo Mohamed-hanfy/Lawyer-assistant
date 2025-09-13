@@ -2,6 +2,7 @@ package com.mohamed.lawyer.logs;
 
 import com.mohamed.lawyer.lawsuit.Lawsuit;
 import com.mohamed.lawyer.lawsuit.LawsuitRepository;
+import com.mohamed.lawyer.whatsapp.WhatsAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ public class LogsService {
     private final LogsRepository logsRepository;
     private final LawsuitRepository lawsuitRepository;
     private final LogsMapper logsMapper;
+    private final WhatsAppService whatsAppService;
 
     public List<LogsResponse> getAllLogs() {
         return logsRepository.findAll()
@@ -44,7 +46,18 @@ public class LogsService {
         logs.setDate(LocalDateTime.now());
         logs.setLawsuit(lawsuit);
 
-        return logsRepository.save(logs).getId();
+        Logs savedLog = logsRepository.save(logs);
+
+        // Send WhatsApp notification to client
+        if (lawsuit.getClientPhone() != null && !lawsuit.getClientPhone().isEmpty()) {
+            whatsAppService.sendLogNotification(
+                lawsuit.getClientPhone(),
+                lawsuit.getName(),
+                request.message()
+            );
+        }
+
+        return savedLog.getId();
     }
 
     public void updateLog(Long id, LogsRequest request) {

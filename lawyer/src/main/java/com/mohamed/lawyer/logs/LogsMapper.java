@@ -16,6 +16,7 @@ public class LogsMapper {
                 .id(logs.getId())
                 .date(logs.getDate())
                 .message(logs.getMessage())
+                .lawsuitName(logs.getLawsuit() != null ? logs.getLawsuit().getName() : null)
                 .build();
     }
 }
