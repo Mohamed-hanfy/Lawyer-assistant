@@ -1,5 +1,6 @@
 package com.mohamed.lawyer.lawsuit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -18,4 +19,7 @@ public class LawsuitResponse {
     private LocalDate date;
     private LocalDate lastModified;
     private Status status;
+
+    @JsonIgnore
+    private double score;
 }

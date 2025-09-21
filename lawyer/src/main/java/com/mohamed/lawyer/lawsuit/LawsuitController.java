@@ -80,4 +80,9 @@ public class LawsuitController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<LawsuitResponse>> searchLawsuits(@RequestParam String search, Authentication connectedUser){
+        return ResponseEntity.ok(service.getFulltextFuzzy(search, connectedUser));
+    }
+
 }

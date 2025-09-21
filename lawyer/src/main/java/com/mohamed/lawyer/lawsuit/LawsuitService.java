@@ -1,12 +1,18 @@
 package com.mohamed.lawyer.lawsuit;
 
 import com.mohamed.lawyer.lawyer.Lawyer;
+import com.mohamed.lawyer.utils.ArabicNormalizer;
+import com.mohamed.lawyer.utils.FuzzyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -107,5 +113,42 @@ public class LawsuitService {
         lawsuit.setLastModified(LocalDate.now());
         repository.save(lawsuit);
     }
+
+    public List<LawsuitResponse> getFulltextFuzzy(String searchTerm, Authentication connectedUser) {
+        Lawyer lawyer = (Lawyer) connectedUser.getPrincipal();
+        String normalizedSearch = ArabicNormalizer.normalize(searchTerm);
+        List<Lawsuit> fulltextResults = repository.findByFullTextSearch(searchTerm, lawyer.getId());
+        List<Lawsuit> allLawsuits = repository.findLawsuitByLawyerId();
+        Set<Long> fulltextIds = fulltextResults.stream()
+                .map(Lawsuit::getId)
+                .collect(Collectors.toSet());
+
+        List<LawsuitResponse> results = fulltextResults.stream()
+                .map(lawsuitMapper::toLawsuitResponse)
+                .peek(dto -> dto.setScore(1.1))
+                .toList();
+
+        List<LawsuitResponse> fuzzyMatches = allLawsuits.stream()
+                .filter(l -> !fulltextIds.contains(l.getId()))
+                .map(lawsuitMapper::toLawsuitResponse)
+                .peek(dto -> {
+                    String normalizedName = ArabicNormalizer.normalize(dto.getName());
+                    String normalizedDescription = ArabicNormalizer.normalize(dto.getDescription());
+
+                    double score = Math.max(
+                            FuzzyUtils.similarity(normalizedSearch, normalizedName),
+                            FuzzyUtils.similarity(normalizedSearch, normalizedDescription)
+                    );
+                    dto.setScore(score);
+
+                })
+                .filter(dto -> dto.getScore() > 0.1)
+                .toList();
+
+        return Stream.concat(results.stream(), fuzzyMatches.stream())
+                .sorted(Comparator.comparingDouble(LawsuitResponse::getScore).reversed())
+                .toList();
+    }
+
 
 }

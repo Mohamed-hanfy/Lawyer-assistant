@@ -24,5 +24,14 @@ public interface LawsuitRepository extends JpaRepository<Lawsuit, Long> {
     @Query("SELECT l FROM Lawsuit l WHERE l.name LIKE CONCAT('%', :name, '%') and l.lawyer.id = ?#{principal.getId()} ")
     List<Lawsuit> findAllByLawsuitName(String name);
 
+    @Query(
+            value = "SELECT  *, MATCH(lawsuit.name,lawsuit.description) AGAINST(:searchTerm IN BOOLEAN MODE) as relevance" +
+                    " FROM lawsuit" +
+                    " WHERE MATCH(lawsuit.name, lawsuit.description) AGAINST(:searchTerm IN BOOLEAN MODE) AND  lawsuit.lawyer_id = :lawyerId " +
+                    " ORDER BY relevance DESC",
+            nativeQuery = true
+    )
+    List<Lawsuit> findByFullTextSearch(String searchTerm, Long lawyerId);
+
 
 }
