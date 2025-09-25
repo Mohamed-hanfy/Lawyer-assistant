@@ -1,6 +1,7 @@
 package com.mohamed.lawyer.lawsuit;
 
 import com.mohamed.lawyer.lawyer.Lawyer;
+import com.mohamed.lawyer.storage.GoogleDriveService;
 import com.mohamed.lawyer.utils.ArabicNormalizer;
 import com.mohamed.lawyer.utils.FuzzyUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class LawsuitService {
 
     private final LawsuitRepository repository;
     private final LawsuitMapper lawsuitMapper;
+    private final GoogleDriveService googleDriveService;
 
     public List<LawsuitResponse> getAllLawsuits(){
        return repository.findLawsuitByLawyerId()
@@ -33,6 +35,7 @@ public class LawsuitService {
         Lawyer lawyer = (Lawyer) connectedUser.getPrincipal();
         Lawsuit lawsuit = lawsuitMapper.toLawsuit(lawsuitRequest);
         lawsuit.setLawyer(lawyer);
+        lawsuit.setFolderId(googleDriveService.createFolder(lawsuit.getName(), null));
         return repository.save(lawsuit).getId();
    }
 

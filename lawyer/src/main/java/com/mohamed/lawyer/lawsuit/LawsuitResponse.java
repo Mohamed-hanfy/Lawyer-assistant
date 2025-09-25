@@ -22,4 +22,7 @@ public class LawsuitResponse {
 
     @JsonIgnore
     private double score;
+
+    @JsonIgnore
+    private String folderId;
 }

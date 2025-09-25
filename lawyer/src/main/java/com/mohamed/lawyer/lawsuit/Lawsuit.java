@@ -46,4 +46,6 @@ public class Lawsuit {
     @ManyToOne
     @JoinColumn(name = "lawyer_id")
     private Lawyer lawyer;
+
+    private String folderId;
 }
