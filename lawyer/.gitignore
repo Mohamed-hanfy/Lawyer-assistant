@@ -1,4 +1,9 @@
 HELP.md
+
+lawyer/src/main/java/com/mohamed/lawyer/storage/tokens/
+lawyer/src/main/java/com/mohamed/lawyer/storage/client_secret.json
+lawyer/src/main/java/com/mohamed/lawyer/storage/cred.json
+
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

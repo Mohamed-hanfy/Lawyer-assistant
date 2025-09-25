@@ -85,4 +85,10 @@ public class LawsuitController {
         return ResponseEntity.ok(service.getFulltextFuzzy(search, connectedUser));
     }
 
+    @PutMapping("/update/{lawsuitId}")
+    public ResponseEntity<Void> updateLawsuit(@PathVariable Long lawsuitId, @Valid @RequestBody LawsuitRequest lawsuitRequest){
+        service.updateLawsuit(lawsuitId, lawsuitRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

@@ -20,11 +20,13 @@ spring:
       jwt:
         secret-key: da6a980067da67a55cd6551fb3b6f2d6a87b03862a33852916ab1b9fbabc4dc0
         expiration: 864000000
-
-
 server:
   servlet:
     context-path: /api/v1/
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
 springdoc:
   swagger-ui:
     csrf:
@@ -36,3 +38,8 @@ whatsapp:
     url: https://messages-sandbox.nexmo.com/v1/messages
   from:
     number: 14157386102
+google:
+  drive:
+    application-name: "Lawyer Application"
+    credentials-path: "lawyer/src/main/java/com/mohamed/lawyer/storage/cred.json"
+    max-results: 50

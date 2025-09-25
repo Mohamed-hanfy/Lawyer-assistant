@@ -150,5 +150,15 @@ public class LawsuitService {
                 .toList();
     }
 
+    public Lawsuit updateLawsuit(Long lawsuitId,LawsuitRequest lawsuitRequest){
+        Lawsuit lawsuit = repository.findById(lawsuitId)
+                .orElseThrow(() -> new IllegalArgumentException("Lawsuit not found"));
+        lawsuit.setName(lawsuitRequest.name());
+        lawsuit.setDescription(lawsuitRequest.description());
+        lawsuit.setClientName(lawsuitRequest.clientName());
+        lawsuit.setClientPhone(lawsuitRequest.clientPhone());
+        lawsuit.setLastModified(LocalDate.now());
+        return repository.save(lawsuit);
 
+    }
 }
