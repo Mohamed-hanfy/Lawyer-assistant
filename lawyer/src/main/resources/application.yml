@@ -24,6 +24,11 @@ spring:
       jwt:
         secret-key: da6a980067da67a55cd6551fb3b6f2d6a87b03862a33852916ab1b9fbabc4dc0
         expiration: 864000000
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+    chat:
+      model: tinydolphin
 server:
   servlet:
     context-path: /api/v1/
@@ -47,3 +52,8 @@ google:
     application-name: "Lawyer Application"
     credentials-path: "lawyer/src/main/java/com/mohamed/lawyer/storage/cred.json"
     max-results: 50
+
+
+logging:
+  level:
+    web: debug

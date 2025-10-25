@@ -20,4 +20,11 @@ public class DocMapper {
                 .lawsuitName(doc.getLawsuit() != null ? doc.getLawsuit().getName() : null)
                 .build();
     }
+
+    public SummaryResponse toSummaryResponse(String summary, String status){
+        return SummaryResponse.builder()
+                .summary(summary)
+                .status(status)
+                .build();
+    }
 }

@@ -2,11 +2,13 @@ package com.mohamed.lawyer.lawsuitdoc;
 
 import com.google.api.services.drive.model.File;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,8 +63,19 @@ public class DocController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/summarize/{fileId}")
+    public Flux<String> summerizeFile(
+            @PathVariable String fileId
+    ) throws IOException {
+        return service.summarizeInPoints(fileId);
+    }
 
+    @GetMapping("/analysis/{fileId}")
+    public Flux<String> analysisFile(
 
-
-
+            @PathVariable String fileId,
+            @RequestParam String specificLow
+    )throws IOException{
+      return service.analysisFile(fileId,specificLow);
+    }
 }

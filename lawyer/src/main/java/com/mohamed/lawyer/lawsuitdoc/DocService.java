@@ -13,6 +13,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class DocService {
         googleDriveService.deleteFile(fileId);
     }
 
-    public String analysisFile(String fileId, String specificLow) throws IOException {
+    public Flux<String> analysisFile(String fileId, String specificLow) throws IOException {
 
         try (PDDocument document = Loader.loadPDF(getDocById(fileId))) {
             PDFTextStripper stripper = new PDFTextStripper();
@@ -85,17 +86,19 @@ public class DocService {
             String prompt = analysisPrompt(fileContent, specificLow);
 
             OllamaOptions options = OllamaOptions.create()
-                    .withModel("deepseek-r1");
+                    .withModel("tinydolphin");
 
             Prompt ollamaPrompt = new Prompt(prompt, options);
             ChatResponse response = chatModel.call(ollamaPrompt);
-            return response.getResult().getOutput().getContent();
+
+            return chatModel.stream(ollamaPrompt)
+                    .map(chatResponse -> chatResponse.getResult().getOutput().getContent());
         }
 
     }
 
 
-    public String summarizeInPoints(String fileId) throws IOException{
+    public Flux<String> summarizeInPoints(String fileId) throws IOException {
         try (PDDocument document = Loader.loadPDF(getDocById(fileId))) {
             PDFTextStripper stripper = new PDFTextStripper();
             stripper.setSortByPosition(true);
@@ -107,7 +110,12 @@ public class DocService {
                     "---\n" + fileContent + "\n---\n\n" +
                     "استخدم الترقيم والتنسيق الواضح.\nUse numbering and clear formatting.";
 
-            return chatModel.call(prompt);
+            OllamaOptions options = OllamaOptions.create()
+                    .withModel("tinydolphin");
+            Prompt ollamaPrompt = new Prompt(prompt, options);
+
+            return chatModel.stream(ollamaPrompt)
+                    .map(chatResponse -> chatResponse.getResult().getOutput().getContent());
         }
     }
 
