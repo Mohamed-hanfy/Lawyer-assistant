@@ -20,12 +20,16 @@ public class DocController {
     private final DocService service;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> uploadFile(
+    public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam String fileName,
             @RequestParam String description,
             @RequestParam Long lawsuitId
     ) throws IOException {
+        if (!file.getContentType().equals("application/pdf")) {
+            return ResponseEntity.badRequest().body("Only PDF files are allowed");
+        }
+
         return ResponseEntity.ok(service.save(file.getBytes(), fileName,description,file.getContentType(),lawsuitId));
     }
 
