@@ -1,8 +1,11 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
-    url: jdbc:mysql://lawyer-system-mohamed-0731.e.aivencloud.com:25083/Lawyer
-    username: avnadmin
-    password: AVNS_iyYQWXXkC874_MYA2RM
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   threads:
@@ -22,8 +25,8 @@ spring:
   application:
     security:
       jwt:
-        secret-key: da6a980067da67a55cd6551fb3b6f2d6a87b03862a33852916ab1b9fbabc4dc0
-        expiration: 864000000
+        secret-key: ${JWT_SECRET_KEY}
+        expiration: ${JWT_EXPIRATION}
   ai:
     ollama:
       base-url: http://localhost:11434
@@ -42,15 +45,15 @@ springdoc:
       enabled: true
 whatsapp:
   api:
-    key: 150f07a1
-    secret: k0AQIKc5X3JlyDYs
-    url: https://messages-sandbox.nexmo.com/v1/messages
+    key: ${WHATSAPP_API_KEY}
+    secret: ${WHATSAPP_API_SECRET}
+    url: ${WHATSAPP_API_URL}
   from:
-    number: 14157386102
+    number: ${WHATSAPP_FROM_NUMBER}
 google:
   drive:
     application-name: "Lawyer Application"
-    credentials-path: "lawyer/src/main/java/com/mohamed/lawyer/storage/cred.json"
+    credentials-path: ${GOOGLE_DRIVE_CREDENTIALS_PATH}
     max-results: 50
 
 
