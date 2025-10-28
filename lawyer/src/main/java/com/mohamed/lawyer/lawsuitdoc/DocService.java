@@ -1,13 +1,18 @@
 package com.mohamed.lawyer.lawsuitdoc;
 
 import com.google.api.services.drive.model.File;
+import com.mohamed.lawyer.config.LegalAIConfig;
 import com.mohamed.lawyer.lawsuit.Lawsuit;
 import com.mohamed.lawyer.lawsuit.LawsuitRepository;
 import com.mohamed.lawyer.storage.GoogleDriveService;
+import com.mohamed.lawyer.utils.LegalPromptSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -19,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static com.mohamed.lawyer.config.LegalAIConfig.MAIN_SYSTEM_PROMPT;
+
 @Service
 @RequiredArgsConstructor
 public class DocService {
@@ -27,6 +34,7 @@ public class DocService {
     private final GoogleDriveService googleDriveService;
     private final LawsuitRepository lawsuitRepository;
     private final ChatModel chatModel;
+    private final ChatClient chatClient;
 
     public Long save(byte[] file,
                      String fileName,
@@ -83,16 +91,28 @@ public class DocService {
             stripper.setLineSeparator("\n");
             String fileContent = stripper.getText(document);
 
-            String prompt = analysisPrompt(fileContent, specificLow);
+            File file = googleDriveService.getFileMetadata(fileId);
 
-            OllamaOptions options = OllamaOptions.create()
-                    .withModel("tinydolphin");
+            String userPrompt = String.format("""
+                    اسم المستند: %s
+                    مجال التركيز: %s
+                    
+                    محتوى المستند:
+                    %s
+                    
+                    الرجاء تقديم تحليل قانوني متعمق مع التركيز على المجال القانوني المحدد.
+                    """, file.getName(), specificLow, fileContent);
 
-            Prompt ollamaPrompt = new Prompt(prompt, options);
-            ChatResponse response = chatModel.call(ollamaPrompt);
 
-            return chatModel.stream(ollamaPrompt)
-                    .map(chatResponse -> chatResponse.getResult().getOutput().getContent());
+            return chatClient.prompt()
+                    .system(LegalAIConfig.MAIN_SYSTEM_PROMPT + "\n\n" +
+                            LegalPromptSpecifications.ANALYSIS_SPEC)
+                    .user(userPrompt)
+                    .options(OllamaOptions.create()
+                            .withModel("tinydolphin")
+                            .withTemperature(0.1f))
+                    .stream()
+                    .content();
         }
 
     }
@@ -105,53 +125,28 @@ public class DocService {
             stripper.setLineSeparator("\n");
             String fileContent = stripper.getText(document);
 
-            String prompt = "قم بتلخيص المستند التالي في نقاط واضحة ومختصرة:\n\n" +
-                    "Summarize the following document in clear and concise points:\n\n" +
-                    "---\n" + fileContent + "\n---\n\n" +
-                    "استخدم الترقيم والتنسيق الواضح.\nUse numbering and clear formatting.";
+            File file = googleDriveService.getFileMetadata(fileId);
 
-            OllamaOptions options = OllamaOptions.create()
-                    .withModel("tinydolphin");
-            Prompt ollamaPrompt = new Prompt(prompt, options);
+            String userPrompt = String.format("""
+            اسم المستند: %s
+            
+            محتوى المستند:
+            %s
+            
+            الرجاء تقديم ملخص شامل وفقاً للتنسيق المحدد.
+            """, file.getName(), fileContent);
 
-            return chatModel.stream(ollamaPrompt)
-                    .map(chatResponse -> chatResponse.getResult().getOutput().getContent());
-        }
-    }
-
-    private String analysisPrompt(String documentText, String specificLaw) {
-        StringBuilder prompt = new StringBuilder();
-
-        prompt.append("أنت محلل قانوني متخصص في القانون المصري.\n\n");
-        prompt.append("You are a legal analyst specialized in Egyptian law.\n\n");
-
-        if (specificLaw != null && !specificLaw.trim().isEmpty()) {
-            prompt.append("قم بتحليل المستند التالي بناءً على: ").append(specificLaw).append("\n");
-            prompt.append("Analyze the following document based on: ").append(specificLaw).append("\n\n");
-        } else {
-            prompt.append("قم بتحليل المستند التالي بناءً على القوانين المصرية المعمول بها.\n");
-            prompt.append("Analyze the following document based on applicable Egyptian laws.\n\n");
+          return chatClient.prompt()
+                    .system(LegalAIConfig.MAIN_SYSTEM_PROMPT + "\n\n" +
+                            LegalPromptSpecifications.SUMMARIZATION_SPEC)
+                    .user(userPrompt)
+                    .options(OllamaOptions.create()
+                            .withModel("tinydolphin")
+                            .withTemperature(0.1f))
+                    .stream()
+                    .content();
         }
 
-        prompt.append("المستند:\n");
-        prompt.append("Document:\n");
-        prompt.append("---\n");
-        prompt.append(documentText);
-        prompt.append("\n---\n\n");
-
-        prompt.append("يرجى تقديم التحليل في نقاط واضحة تتضمن:\n");
-        prompt.append("Please provide the analysis in clear points including:\n");
-        prompt.append("1. ملخص المستند (Document Summary)\n");
-        prompt.append("2. المواد القانونية المعنية (Relevant Legal Articles)\n");
-        prompt.append("3. التحليل القانوني (Legal Analysis)\n");
-        prompt.append("4. الملاحظات والتوصيات (Observations and Recommendations)\n");
-        prompt.append("5. المخاطر القانونية المحتملة (Potential Legal Risks)\n\n");
-
-        prompt.append("استخدم اللغة العربية والإنجليزية في الإجابة.\n");
-        prompt.append("Use both Arabic and English in your response.\n");
-
-        return prompt.toString();
     }
-
 
 }
