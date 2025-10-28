@@ -109,7 +109,7 @@ public class DocService {
                             LegalPromptSpecifications.ANALYSIS_SPEC)
                     .user(userPrompt)
                     .options(OllamaOptions.create()
-                            .withModel("tinydolphin")
+                            .withModel("qwen3:1.7b")
                             .withTemperature(0.1f))
                     .stream()
                     .content();
@@ -141,7 +141,7 @@ public class DocService {
                             LegalPromptSpecifications.SUMMARIZATION_SPEC)
                     .user(userPrompt)
                     .options(OllamaOptions.create()
-                            .withModel("tinydolphin")
+                            .withModel("qwen3:1.7b")
                             .withTemperature(0.1f))
                     .stream()
                     .content();

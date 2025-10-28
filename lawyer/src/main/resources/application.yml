@@ -31,7 +31,14 @@ spring:
     ollama:
       base-url: http://localhost:11434
     chat:
-      model: tinydolphin
+      model: qwen3:1.7b
+      options:
+        max-tokens: 2000
+        temperature: 0.7
+        stop: [ "END", "\n\n\n" ]
+        frequency-penalty: 0.5
+        presence-penalty: 0.3
+
 server:
   servlet:
     context-path: /api/v1/
