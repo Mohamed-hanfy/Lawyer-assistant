@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Spring Boot Application
+  app:
+    build:
+      context: ./lawyer
+      dockerfile: Dockerfile
+    container_name: lawyer-app
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT:-8080}:8080"
+      # Expose OAuth callback ports (8080-8090)
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+      - "8085:8085"
+      - "8086:8086"
+      - "8087:8087"
+      - "8088:8088"
+      - "8089:8089"
+      - "8090:8090"
+    environment:
+      # Database configuration (using hosted database)
+      SPRING_DATASOURCE_URL: ${DATABASE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DATABASE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATABASE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-update}
+      SPRING_JPA_SHOW_SQL: ${SHOW_SQL:-false}
+
+      # Google Drive OAuth2 configuration
+      GOOGLE_CREDENTIALS_PATH: /app/credentials/client_secret.json
+      GOOGLE_TOKENS_PATH: /app/tokens
+
+      # Application configuration
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
+
+      # JVM options (optional, for tuning)
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    volumes:
+      # Mount tokens directory to persist OAuth2 tokens
+      - ./lawyer/src/main/java/com/mohamed/lawyer/storage/tokens:/app/tokens
+
+      # Mount credentials (read-only for security)
+      - ./lawyer/src/main/java/com/mohamed/lawyer/storage/client_secret.json:/app/credentials/client_secret.json:ro
+
+      # Optional: Mount application logs
+      - ./logs:/app/logs
+    restart: unless-stopped

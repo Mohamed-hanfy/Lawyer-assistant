@@ -34,8 +34,16 @@ public class GoogleDriveService {
 
     private static final String APPLICATION_NAME = "Lawyer Application";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String CREDENTIALS_FILE_PATH = "lawyer/src/main/java/com/mohamed/lawyer/storage/client_secret.json";
-    private static final String TOKENS_DIRECTORY_PATH = "lawyer/src/main/java/com/mohamed/lawyer/storage/tokens";
+
+    // Use environment variables for Docker compatibility, fallback to local paths for development
+    private static final String CREDENTIALS_FILE_PATH = System.getenv().getOrDefault(
+            "GOOGLE_CREDENTIALS_PATH",
+            "lawyer/src/main/java/com/mohamed/lawyer/storage/client_secret.json"
+    );
+    private static final String TOKENS_DIRECTORY_PATH = System.getenv().getOrDefault(
+            "GOOGLE_TOKENS_PATH",
+            "lawyer/src/main/java/com/mohamed/lawyer/storage/tokens"
+    );
 
     private Drive driveService;
 
