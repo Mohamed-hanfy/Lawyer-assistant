@@ -474,7 +474,7 @@ lawyer/
 
 3. **Check health status:**
    ```bash
-   curl http://localhost:8080/actuator/health
+   curl http://localhost:8080/api/v1/actuator/health
    ```
 
 ### Troubleshooting
@@ -504,8 +504,6 @@ lawyer/
 - Or stop conflicting service: `lsof -ti:8080 | xargs kill -9`
 
 ### Additional Resources
-
-- **Docker OAuth2 Guide**: See `DOCKER_OAUTH2_GUIDE.md` for detailed OAuth2 setup
 - **API Documentation**: Access Swagger UI when application is running
 - **Spring AI Documentation**: https://docs.spring.io/spring-ai/reference/
 - **Ollama Documentation**: https://ollama.ai/docs
