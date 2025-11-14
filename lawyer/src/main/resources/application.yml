@@ -38,6 +38,14 @@ spring:
         stop: [ "END", "\n\n\n" ]
         frequency-penalty: 0.5
         presence-penalty: 0.3
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 60000ms
+  cache:
+    type: redis
+
 
 server:
   servlet:
