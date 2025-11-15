@@ -4,6 +4,8 @@ import com.mohamed.lawyer.lawsuit.Lawsuit;
 import com.mohamed.lawyer.lawsuit.LawsuitRepository;
 import com.mohamed.lawyer.whatsapp.WhatsAppService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,26 +20,30 @@ public class LogsService {
     private final LogsMapper logsMapper;
     private final WhatsAppService whatsAppService;
 
+    private final String CACHE_VALUE = "logs_";
+
+    @Cacheable(value = CACHE_VALUE, key = "'all_logs'")
     public List<LogsResponse> getAllLogs() {
         return logsRepository.findAll()
                 .stream()
                 .map(logsMapper::toResponse)
                 .toList();
     }
-
+    @Cacheable(value = CACHE_VALUE, key ="#id")
     public LogsResponse getLogById(Long id) {
         Logs logs = logsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Log not found"));
         return logsMapper.toResponse(logs);
     }
 
+   @Cacheable(value = CACHE_VALUE, key = "#lawsuitId")
     public List<LogsResponse> getLogsByLawsuitId(Long lawsuitId) {
         return logsRepository.findByLawsuitId(lawsuitId)
                 .stream()
                 .map(logsMapper::toResponse)
                 .toList();
     }
-
+    @CacheEvict(value = CACHE_VALUE, key = "#lawsuitId")
     public Long createLog(LogsRequest request, Long lawsuitId) {
         Lawsuit lawsuit = lawsuitRepository.findById(lawsuitId)
                 .orElseThrow(() -> new IllegalArgumentException("Lawsuit not found"));
@@ -61,6 +67,7 @@ public class LogsService {
         return savedLog.getId();
     }
 
+    @CacheEvict(value = CACHE_VALUE, allEntries = true)
     public void updateLog(Long id, LogsRequest request) {
         Logs logs = logsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Log not found"));

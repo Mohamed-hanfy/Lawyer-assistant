@@ -5,6 +5,8 @@ import com.mohamed.lawyer.storage.GoogleDriveService;
 import com.mohamed.lawyer.utils.ArabicNormalizer;
 import com.mohamed.lawyer.utils.FuzzyUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,9 @@ public class LawsuitService {
     private final LawsuitMapper lawsuitMapper;
     private final GoogleDriveService googleDriveService;
 
+    private final String CACHE_VALUE = "lawsuits";
+
+    @Cacheable(value = CACHE_VALUE , key = "'all'")
     public List<LawsuitResponse> getAllLawsuits(){
        return repository.findLawsuitByLawyerId()
                .stream()
@@ -30,6 +35,7 @@ public class LawsuitService {
                .toList();
    }
 
+   @CacheEvict(value = CACHE_VALUE , key = "'all'")
    public Long addLawsuit(LawsuitRequest lawsuitRequest,
                              Authentication connectedUser){
         Lawyer lawyer = (Lawyer) connectedUser.getPrincipal();
@@ -39,7 +45,7 @@ public class LawsuitService {
         return repository.save(lawsuit).getId();
    }
 
-
+   @Cacheable(value = CACHE_VALUE , key = "#status")
     public List<LawsuitResponse> getLawsuitByStatus(Status status) {
         return repository.findLawsuitByStatus(status)
                 .stream()
@@ -47,6 +53,7 @@ public class LawsuitService {
                 .toList();
     }
 
+    @Cacheable(value = CACHE_VALUE , key = "#clientName")
     public List<LawsuitResponse> getLawsuitByClientName(String clientName){
         return repository.findLawsuitByClientName(clientName)
                 .stream()
@@ -153,6 +160,7 @@ public class LawsuitService {
                 .toList();
     }
 
+    @CacheEvict(value = CACHE_VALUE, allEntries = true)
     public Lawsuit updateLawsuit(Long lawsuitId,LawsuitRequest lawsuitRequest){
         Lawsuit lawsuit = repository.findById(lawsuitId)
                 .orElseThrow(() -> new IllegalArgumentException("Lawsuit not found"));

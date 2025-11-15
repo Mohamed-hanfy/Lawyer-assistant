@@ -27,6 +27,7 @@ spring:
       jwt:
         secret-key: ${JWT_SECRET_KEY}
         expiration: ${JWT_EXPIRATION}
+
   ai:
     ollama:
       base-url: http://localhost:11434

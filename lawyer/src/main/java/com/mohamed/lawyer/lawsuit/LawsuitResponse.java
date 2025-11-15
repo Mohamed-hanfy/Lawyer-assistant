@@ -1,15 +1,18 @@
 package com.mohamed.lawyer.lawsuit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LawsuitResponse {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LawsuitResponse  implements Serializable {
     private Long id;
     private String name;
     private String description;

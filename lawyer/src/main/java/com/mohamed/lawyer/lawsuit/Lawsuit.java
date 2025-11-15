@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "lawsuit")
-public class Lawsuit {
+public class Lawsuit  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
